@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore Security - Cloud & RBAC System</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Font: Plus Jakarta Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="h-full font-['Plus_Jakarta_Sans'] text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-md w-full px-4 pointer-events-none"></div>
+
+  <!-- CONTAINER PRINCIPAL -->
+  <div id="app" class="min-h-screen flex flex-col">
+
+    <!-- ========================================== -->
+    <!-- SECCIÓN 1: AUTENTICACIÓN (LOGIN & REGISTRO) -->
+    <!-- ========================================== -->
+    <div id="auth-section" class="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/40 relative overflow-hidden">
+      
+      <!-- Efectos de Fondo Neón -->
+      <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="w-full max-w-md space-y-6 relative z-10">
+        
+        <!-- Branding Logo -->
+        <div class="text-center space-y-2">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 shadow-xl shadow-indigo-500/10 mb-2 backdrop-blur-md">
+            <i class="fa-solid fa-shield-halved text-3xl"></i>
+          </div>
+          <h1 class="text-3xl font-extrabold tracking-tight text-white">TechStore Security</h1>
+          <p class="text-sm text-slate-400">Sistema de Control de Acceso y Gestión Multitienda</p>
+        </div>
+
+        <!-- Tarjeta de Formulario Glassmorphism -->
+        <div class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+          
+          <!-- Pestañas Login / Registro -->
+          <div class="flex p-1 bg-slate-950/60 rounded-xl border border-slate-800/80 mb-6">
+            <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-indigo-600 text-white shadow-md">
+              <i class="fa-solid fa-lock mr-2"></i>Iniciar Sesión
+            </button>
+            <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition-all duration-200">
+              <i class="fa-solid fa-user-plus mr-2"></i>Registrarse
+            </button>
+          </div>
+
+          <!-- FORMULARIO LOGIN -->
+          <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Correo Electrónico</label>
+              <div class="relative">
+                <i class="fa-solid fa-envelope absolute left-4 top-3.5 text-slate-500"></i>
+                <input type="email" id="login-email" required placeholder="admin@techstore.com" class="w-full bg-slate-950/70 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Contraseña</label>
+              <div class="relative">
+                <i class="fa-solid fa-key absolute left-4 top-3.5 text-slate-500"></i>
+                <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-950/70 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+              </div>
+            </div>
+            <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/25 transition duration-200 flex items-center justify-center gap-2">
+              <span>Continuar con MFA</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </form>
+
+          <!-- FORMULARIO REGISTRO -->
+          <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Nombre Completo</label>
+              <input type="text" id="reg-fullName" required placeholder="Naomi Sanchez" class="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Correo Electrónico</label>
+              <input type="email" id="reg-email" required placeholder="tu_correo@ejemplo.com" class="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Contraseña Compleja</label>
+              <input type="password" id="reg-password" required placeholder="Password123!" class="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+              <p class="text-[11px] text-slate-500 mt-1">Mínimo 8 caracteres, 1 mayúscula y 1 símbolo especial.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Rol de Usuario</label>
+                <select id="reg-role" class="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                  <option value="Administrador del Sistema">Administrador</option>
+                  <option value="Gerente de Tienda">Gerente de Tienda</option>
+                  <option value="Empleado de Ventas">Empleado de Ventas</option>
+                  <option value="Auditor">Auditor</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Tienda Asignada</label>
+                <select id="reg-storeId" class="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                  <option value="1">TechStore Central (ID 1)</option>
+                  <option value="2">TechStore Norte (ID 2)</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition duration-200">
+              Crear Cuenta Segura
+            </button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MODAL MFA: CÓDIGO DE VERIFICACIÓN 6 DÍGITOS -->
+    <!-- ========================================== -->
+    <div id="mfa-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
+      <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl text-center space-y-5 animate-in fade-in zoom-in duration-200">
+        <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-center mx-auto text-amber-400 text-2xl">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-white">Verificación MFA Requerida</h3>
+          <p class="text-xs text-slate-400 mt-1">Hemos enviado un código de 6 dígitos a su correo electrónico asignado.</p>
+        </div>
+        <form onsubmit="handleVerifyMFA(event)" class="space-y-4">
+          <input type="text" id="mfa-code" maxlength="6" required placeholder="217333" class="w-full text-center text-2xl tracking-[0.5em] font-mono font-bold bg-slate-950 border border-slate-800 rounded-2xl py-3 text-indigo-400 focus:outline-none focus:border-indigo-500">
+          <div class="flex gap-2">
+            <button type="button" onclick="closeMFAModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs">Cancelar</button>
+            <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs shadow-lg shadow-indigo-600/30">Verificar Código</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- SECCIÓN 2: DASHBOARD Y GESTIÓN DE INVENTARIO -->
+    <!-- ========================================== -->
+    <div id="dashboard-section" class="flex-1 flex flex-col hidden bg-slate-950">
+      
+      <!-- NAVBAR SUPERIOR -->
+      <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-xl sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-bold">
+              <i class="fa-solid fa-store"></i>
+            </div>
+            <div>
+              <span class="font-bold text-white text-base block leading-tight">TechStore System</span>
+              <span class="text-[11px] text-slate-400 font-medium">Control RBAC & Inventario Cloud</span>
+            </div>
+          </div>
+
+          <!-- USER BADGE -->
+          <div class="flex items-center gap-4">
+            <div class="hidden sm:flex flex-col text-right">
+              <span id="user-display-name" class="text-xs font-semibold text-white">Cargando...</span>
+              <div class="flex items-center justify-end gap-1.5 mt-0.5">
+                <span id="user-display-role" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Rol</span>
+                <span id="user-display-store" class="text-[10px] text-slate-400">Tienda 1</span>
+              </div>
+            </div>
+            <button onclick="handleLogout()" class="p-2.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition border border-transparent hover:border-red-500/20" title="Cerrar Sesión">
+              <i class="fa-solid fa-right-from-bracket text-base"></i>
+            </button>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- CONTENIDO DEL DASHBOARD -->
+      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <!-- METRICAS / METRIC CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-400 font-medium">Total Productos</p>
+              <h4 id="stat-total-products" class="text-2xl font-extrabold text-white mt-1">0</h4>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-xl">
+              <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-400 font-medium">Stock Crítico (&lt; 5)</p>
+              <h4 id="stat-low-stock" class="text-2xl font-extrabold text-amber-400 mt-1">0</h4>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-400 font-medium">Estado de Token JWT</p>
+              <h4 class="text-xs font-bold text-emerald-400 mt-2 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Activo & Validado
+              </h4>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+              <i class="fa-solid fa-key"></i>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-400 font-medium">Nivel de Permisos</p>
+              <h4 id="stat-access-level" class="text-xs font-bold text-indigo-400 mt-2">Acceso Total</h4>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl">
+              <i class="fa-solid fa-user-gear"></i>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- BARRA DE ACCIONES / BUSCADOR / BOTÓN AGREGAR -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-slate-900/40 p-4 border border-slate-800/80 rounded-2xl">
+          <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-500"></i>
+            <input type="text" id="search-input" oninput="renderProductsTable()" placeholder="Buscar por nombre de producto..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-11 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+          </div>
+          
+          <button id="btn-add-product" onclick="openAddProductModal()" class="py-2.5 px-5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center justify-center gap-2 text-sm hidden">
+            <i class="fa-solid fa-plus"></i>
+            <span>Nuevo Producto</span>
+          </button>
+        </div>
+
+        <!-- TABLA DE PRODUCTOS -->
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden shadow-2xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider font-bold text-slate-400">
+                  <th class="py-4 px-6">Producto</th>
+                  <th class="py-4 px-6">Tienda</th>
+                  <th class="py-4 px-6">Precio (S/.)</th>
+                  <th class="py-4 px-6">Stock Actual</th>
+                  <th class="py-4 px-6 text-right">Acciones Disponibles (RBAC)</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body" class="divide-y divide-slate-800/60 text-sm">
+                <!-- Se llena dinámicamente con JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- MODAL: AGREGAR PRODUCTO -->
+  <div id="add-product-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
+    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-box-archive mr-2 text-indigo-400"></i>Registrar Producto</h3>
+        <button onclick="closeAddProductModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form onsubmit="handleCreateProduct(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Nombre del Producto</label>
+          <input type="text" id="prod-name" required placeholder="Monitor OLED 32 IPS" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Precio (S/.)</label>
+            <input type="number" step="0.01" id="prod-price" required placeholder="1299.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Stock Inicial</label>
+            <input type="number" id="prod-stock" required placeholder="15" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Tienda Destino</label>
+          <select id="prod-storeId" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+            <option value="1">TechStore Central (ID 1)</option>
+            <option value="2">TechStore Norte (ID 2)</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition">
+          Guardar Producto
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
