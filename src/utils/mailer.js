@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 async function sendMfaCodeEmail(email, code) {
   // Mostrar también en consola para facilitar pruebas de desarrollo
   console.log(`\n==================================================`);
-  console.log(`📧 [MFA EMAIL SIMULADO] Destinatario: ${email}`);
+  console.log(`📧 [MFA EMAIL] Destinatario: ${email}`);
   console.log(`🔑 Código MFA de 6 dígitos: ${code}`);
   console.log(`⏰ Válido por 5 minutos`);
   console.log(`==================================================\n`);
